@@ -1,3 +1,4 @@
+import mongoose, { Schema, Document } from 'mongoose';
 export type NotaryserviceType =
     | "Certidão de Nascimento"
     | "Reconhecimento de Firma"
@@ -11,19 +12,42 @@ export type NotaryserviceStatus =
     | "Concluído";
 
 export interface NotaryserviceBase { //Serviço base
-    type: NotaryserviceType;
+    servicetype: NotaryserviceType;
     requester_name: string;
     requester_CPF: string;
     description?: string;
     status: NotaryserviceStatus;
-    request_date: Date;
     observations?: string;
 }
 
-export type CreateNotaryservideDTO = NotaryserviceBase; //type alias
+export type CreateNotaryservideDTO = Omit<NotaryserviceBase, 'status' >; //type alias
 
 export interface NotaryserviceEntity extends NotaryserviceBase{
-    _id: number;
+    _id: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export type NotaryserviceResponse = Omit<NotaryserviceEntity, '_id'>;
+
+// DB, regras de negócio
+export interface NotaryserviceDocument extends Omit<NotaryserviceEntity, '_id'>, Document {}
+const NotaryserviceSchema = new Schema({
+    servicetype: { type: String, enum: ['Certidão de Nascimento'
+    , 'Reconhecimento de Firma'
+    , 'Autenticação'
+    , 'Escritura'
+    , 'Outro'], default: 'Outro'},
+    requester_name: { type: String, required: true },
+    requester_CPF: { type: String, required: true },
+    description: { type: String },
+    status: { type: String, enum: ['Aguardando'
+    , 'Em andamento'
+    , 'Concluído'], default: 'Aguardando' },
+    request_date: { type: Date, required: true },
+    observations: { type: String }
+}, { 
+    timestamps: true // Isso cria automaticamente os campos createdAt e updatedAt!
+});
+
+export const NotaryserviceModel = mongoose.model<NotaryserviceDocument>('NotaryService', NotaryserviceSchema);
