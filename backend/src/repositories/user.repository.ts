@@ -1,54 +1,60 @@
 // src/repositories/user.repository.ts
 import { prisma } from '../config/db';
-import { Role } from '@prisma/client';
+import { SaveUserDbDTO, UpdateUserDTO, UserResponse } from '../dtos/user.dto'
 
 export class UserRepository {
     
-    // 1. Criar um novo usuário
-    // O controller já vai mandar a senha com Hash para cá, nunca a senha plana!
-    async create(dados: { nome: string; email: string; senhaHash: string; perfil?: Role }) {
+    async create(dados: SaveUserDbDTO): Promise<UserResponse> { //nesse caso no service eu retiro a senha para passar ao controler, entao tudo bem.
         const novoUsuario = await prisma.user.create({
-            data: dados
+            data: dados,
+            omit: { senhaHash: true }
         });
         return novoUsuario;
     }
 
-    async findAll() {
+    async findAll(): Promise<UserResponse[]> { // em vez de um select gigante usar o omit.
         return await prisma.user.findMany({
-             orderBy: { nome: 'desc' },
-            select: {
-                id: true,
-                nome: true,
-                email: true,
-                perfil: true,
-                createdAt: true,
-                updatedAt: true
+            orderBy: { nome: 'desc' },
+            omit: {
+                senhaHash: true
             }
         });
     }
 
-    async findById(id: string) {
-        return await prisma.user.findUnique({
+    async findById(id: string): Promise<UserResponse | null>{ // tipagem estrutural (apelidada de duck typing) faz com que o omit nao seja necessario
+        return await prisma.user.findUnique({ // ou seja, o codigo nao vai apitar erro, mas passar senhaHash para vai ser um erro de seguranca.
             where: { id },
-            select: {
-                id: true,
-                nome: true,
-                email: true,
-                perfil: true,
-                createdAt: true
+            omit: {
+                senhaHash: true
             }
         });
     }
 
-    async findByEmail(email: string) {
+    async findByEmail(email: string):  Promise<UserResponse | null>{
         return await prisma.user.findUnique({
-            where: { email }
+            where: { email },
+            omit: {
+                senhaHash: true
+            }
         });
     }
 
-    async delete(id: string) {
+    async updateUser(id: string, dados: UpdateUserDTO) : Promise<UserResponse>{
+        return await prisma.user.update({
+            where: { id },
+            data: dados,
+            omit: {
+                senhaHash: true
+            }
+        });
+    }
+
+    async delete(id: string) : Promise<UserResponse>{
         return await prisma.user.delete({
-            where: { id }
+            where: { id },
+            omit: {
+                senhaHash: true
+            }
         });
     }
 }
