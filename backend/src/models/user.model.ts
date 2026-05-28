@@ -1,35 +1,12 @@
-import mongoose, { Schema, Document } from 'mongoose';
-export type UserRole = "Atendente" | "Administrador";
+import { User } from '@prisma/client';
 
-export interface UserBase { //modelo base do usuario
-    name: string;
+export interface CreateUserDTO {
+    nome: string;
     email: string;
-    role: UserRole;
+    senhaPlana: string;
+    perfil?: "ATENDENTE" | "ADMINISTRADOR"; 
 }
 
-export interface CreateUserDTO extends UserBase {
-    planePassword: string;
-}
+export type UpdateUserDTO = Partial<Omit<CreateUserDTO, 'senhaPlana'>>;
 
-export interface UserEntity extends UserBase {
-    _id: string;
-    hashPassword: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-}
-
-export type UserResponse = Omit<UserEntity, '_id' | 'hashPassword'>;
-
-// DB
-export interface UserDocument extends Omit<UserEntity, '_id'>, Document {}
-
-const UserSchema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    hashPassword: { type: String, required: true },
-    role: { type: String, enum: ['Atendente', 'Administrador'], default: 'Atendente' }
-}, { 
-    timestamps: true
-});
-
-export const UserModel = mongoose.model<UserDocument>('User', UserSchema);
+export type UserResponse = Omit<User, 'senhaHash'>;

@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ATENDENTE
+  ADMINISTRADOR
+}
+
+enum StatusServico {
+  AGUARDANDO
+  EM_ANDAMENTO
+  CONCLUIDO
+}
+
+enum TipoServico {
+  CERTIDAO_NASCIMENTO
+  RECONHECIMENTO_FIRMA
+  AUTENTICACAO
+  ESCRITURA
+  OUTRO
+}
+
+model User {
+  id        String   @id @default(uuid()) // Gera aquele ID seguro automaticamente
+  nome      String
+  email     String   @unique
+  senhaHash String
+  perfil    Role     @default(ATENDENTE)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users") // Nome da tabela no banco (minúsculo e plural)
+}
+
+model NotaryService {
+  id              String        @id @default(uuid())
+  tipo            TipoServico   @default(OUTRO)
+  solicitanteNome String
+  solicitanteCpf  String
+  descricao       String?       // O '?' significa que é opcional!
+  status          StatusServico @default(AGUARDANDO)
+  observacoes     String?
+  
+  createdAt       DateTime      @default(now()) // É a nossa data de solicitação
+  updatedAt       DateTime      @updatedAt
+
+  @@map("notary_services")
+}

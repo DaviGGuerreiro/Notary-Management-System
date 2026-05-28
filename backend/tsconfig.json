@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
-    "moduleResolution": "Node",
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
@@ -10,7 +9,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "moduleResolution": "Node",
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
