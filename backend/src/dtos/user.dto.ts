@@ -9,4 +9,6 @@ export interface CreateUserDTO {
 
 export type UpdateUserDTO = Partial<Omit<CreateUserDTO, 'senhaPlana'>>;
 
+export type SaveUserDbDTO = Omit<CreateUserDTO, 'senhaPlana'> & {senhaHash: string};
+
 export type UserResponse = Omit<User, 'senhaHash'>;
