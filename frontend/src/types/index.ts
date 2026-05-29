@@ -11,7 +11,7 @@ export interface Service {
   id: string;
   solicitanteNome: string;
   solicitanteCpf: string;
-  tipo: 'Certidão de Nascimento' | 'Reconhecimento de Firma' | 'Autenticação' | 'Escritura' | 'Outro';
+  tipo: 'CERTIDAO_NASCIMENTO' | 'RECONHECIMENTO_FIRMA' | 'AUTENTICACAO' | 'ESCRITURA' | 'OUTRO';
   descricao: string;
   observacoes?: string;
   status: 'AGUARDANDO' | 'EM_ANDAMENTO' | 'CONCLUIDO';
