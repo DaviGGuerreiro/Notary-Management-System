@@ -43,7 +43,7 @@ model NotaryService {
   tipo            TipoServico   @default(OUTRO)
   solicitanteNome String
   solicitanteCpf  String
-  descricao       String?       // O '?' significa que é opcional!
+  descricao       String       // O '?' significa que é opcional!
   status          StatusServico @default(AGUARDANDO)
   observacoes     String?
   
