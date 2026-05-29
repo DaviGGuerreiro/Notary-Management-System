@@ -4,11 +4,13 @@ export interface CreateNotaryserviceDTO {
     tipo?: TipoServico;
     solicitanteNome: string;
     solicitanteCpf: string;
-    descricao?: string;
+    descricao: string;
     observacoes?: string;
 }
 
-export type UpdateNotaryserviceDTO = Partial<CreateNotaryserviceDTO>;
+export type UpdateNotaryservicePatchDTO = Partial<CreateNotaryserviceDTO>; // Patch
+
+export type UpdateNotaryservicePutDTO = CreateNotaryserviceDTO;
 
 export interface UpdateNotaryserviceStatusDTO {
     status: StatusServico; // Aceita: "AGUARDANDO", "EM_ANDAMENTO", "CONCLUIDO"

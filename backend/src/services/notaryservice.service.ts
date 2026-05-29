@@ -1,5 +1,5 @@
 import { NotaryserviceRepository } from '../repositories/notaryservice.repository';
-import { CreateNotaryserviceDTO, UpdateNotaryserviceDTO, UpdateNotaryserviceStatusDTO } from '../dtos/notaryservice.dto'; 
+import { CreateNotaryserviceDTO, UpdateNotaryservicePatchDTO, UpdateNotaryserviceStatusDTO, UpdateNotaryservicePutDTO } from '../dtos/notaryservice.dto'; 
 
 export class NotaryserviceService {
     private repository: NotaryserviceRepository;
@@ -13,8 +13,9 @@ export class NotaryserviceService {
         return await this.repository.create(dados);
     }
 
-    async getAllServices() {
-        return await this.repository.findAll();
+    async getAllServices(filtros: { tipo?: any, status?: any }) {
+        // Você pode colocar lógicas de negócio aqui no futuro, se necessário.
+        return await this.repository.getAllServices(filtros);
     }
 
     async getServiceById(id: string) {
@@ -34,7 +35,12 @@ export class NotaryserviceService {
         return await this.repository.updateStatus(id, novoStatus);
     }
 
-    async updateService(id: string, dados: UpdateNotaryserviceDTO) {
+    async updateService(id: string, dados: UpdateNotaryservicePatchDTO) {
+        await this.getServiceById(id);
+        return await this.repository.updateService(id, dados);
+    }
+
+    async replaceService(id: string, dados: UpdateNotaryservicePutDTO) {
         await this.getServiceById(id);
         return await this.repository.updateService(id, dados);
     }
