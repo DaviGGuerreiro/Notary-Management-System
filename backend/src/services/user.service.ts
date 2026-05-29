@@ -1,6 +1,6 @@
 import { UserRepository } from '../repositories/user.repository';
 import bcrypt from 'bcrypt';
-import { CreateUserDTO, UpdateUserDTO } from '../dtos/user.dto'; 
+import { CreateUserDTO, UpdateUserPatchDTO, UpdateUserPutDTO } from '../dtos/user.dto'; 
 
 export class UserService {
     private repository: UserRepository;
@@ -35,7 +35,12 @@ export class UserService {
         return usuario;
     }
 
-    async updateUser(id: string, dados: UpdateUserDTO) {
+    async replaceUser(id: string, dados: UpdateUserPutDTO) {
+        await this.getUserById(id);
+        return await this.repository.updateUser(id, dados);
+    }
+
+    async updateUser(id: string, dados: UpdateUserPatchDTO) {
         await this.getUserById(id);
         return await this.repository.updateUser(id, dados);
     }
