@@ -1,6 +1,7 @@
 // src/repositories/user.repository.ts
 import { prisma } from '../config/db';
-import { SaveUserDbDTO, UpdateUserPatchDTO, UserResponse } from '../dtos/user.dto'
+import { SaveUserDbDTO, UpdateUserPatchDTO, UserResponse, LoginResponseDTO } from '../dtos/user.dto'
+import { User } from '@prisma/client';
 
 export class UserRepository {
     
@@ -55,6 +56,12 @@ export class UserRepository {
             omit: {
                 senhaHash: true
             }
+        });
+    }
+
+    async findByEmailComSenha(email: string): Promise<User | null> {
+        return await prisma.user.findUnique({
+            where: { email }
         });
     }
 }

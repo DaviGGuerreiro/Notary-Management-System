@@ -1,6 +1,6 @@
 import { UserRepository } from '../repositories/user.repository';
 import bcrypt from 'bcrypt';
-import { CreateUserDTO, UpdateUserPatchDTO, UpdateUserPutDTO } from '../dtos/user.dto'; 
+import { CreateUserDTO, UpdateUserPatchDTO, UpdateUserPutDTO, LoginDTO, UserResponse } from '../dtos/user.dto'; 
 
 export class UserService {
     private repository: UserRepository;
@@ -48,5 +48,21 @@ export class UserService {
     async deleteUser(id: string) {
         await this.getUserById(id);
         return await this.repository.delete(id);
+    }
+
+    async login(dados: LoginDTO): Promise<UserResponse> {
+        const usuario = await this.repository.findByEmailComSenha(dados.email);
+        if (!usuario) {
+            throw new Error('Credenciais inválidas.');
+        }
+
+        const senhaCorreta = await bcrypt.compare(dados.senhaPlana, usuario.senhaHash);
+
+        if (!senhaCorreta) {
+            throw new Error('Credenciais inválidas.');
+        }
+
+        const { senhaHash, ...usuarioSemSenha } = usuario;
+        return usuarioSemSenha;
     }
 }

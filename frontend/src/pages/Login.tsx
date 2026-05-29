@@ -1,16 +1,21 @@
-// frontend/src/pages/Login.tsx
 import { useState } from 'react';
+import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const navigate = useNavigate(); // Ferramenta mágica para trocar de página via código
+  const [erro, setErro] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.SyntheticEvent) => {
+  const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    // ainda não existe bloqueio no login de algum usuario.
-    navigate('/usuarios');
+    try {
+      await api.post('/users/login', { email, senhaPlana: senha });
+      navigate('/usuarios');
+    } catch {
+      setErro('E-mail ou senha inválidos.');
+    }
   };
 
   return (
@@ -63,13 +68,13 @@ export function Login() {
             placeholder="••••••••"
           />
         </div>
-
         <button 
           type="submit" 
           className="btn btn-primary"
           style={{ width: '100%', padding: '13px', fontSize: '15px', marginTop: '8px' }}>
           Entrar no Sistema
         </button>
+        {erro && <p style={{ color: '#dc2626', fontSize: '13px', textAlign: 'center' }}>{erro}</p>}
       </form>
     </div>
   </div>

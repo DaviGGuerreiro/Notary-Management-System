@@ -1,7 +1,7 @@
 // src/controllers/user.controller.ts
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
-import { CreateUserDTO, UpdateUserPutDTO, UpdateUserPatchDTO } from '../dtos/user.dto';
+import { CreateUserDTO, UpdateUserPutDTO, LoginDTO } from '../dtos/user.dto';
 
 export class UserController {
     private userService: UserService;
@@ -110,6 +110,26 @@ export class UserController {
         } catch (error: any) {
             if (error.message === 'Usuário não encontrado.') {
                 return res.status(404).json({ erro: error.message });
+            }
+            console.error(error);
+            return res.status(500).json({ erro: 'Erro interno do servidor.' });
+        }
+    }
+
+    login = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const dados: LoginDTO = req.body;
+
+            if (!dados.email || !dados.senhaPlana) {
+                return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
+            }
+
+            const usuario = await this.userService.login(dados);
+            return res.status(200).json(usuario);
+
+        } catch (error: any) {
+            if (error.message === 'Credenciais inválidas.') {
+                return res.status(401).json({ erro: error.message });
             }
             console.error(error);
             return res.status(500).json({ erro: 'Erro interno do servidor.' });
