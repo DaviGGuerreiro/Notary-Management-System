@@ -1,16 +1,23 @@
 import { Router } from "express";
-import { } from "../controllers/notaryservice.controller";
+import { NotaryserviceController } from "../controllers/notaryservice.controller";
 
 const router = Router();
+const notaryController = new NotaryserviceController();
 
-router.route("/")
-    .get()
+router.route('/')
+    .get(notaryController.getAll)
+    .post(notaryController.create);
 
-router.route("/:id")
-    .get()
-    .post()
-    .delete()
-    .patch()
-    .put()
+router.route('/cpf/:cpf')
+    .get(notaryController.getByCpf);
+
+router.route('/:id')
+    .get(notaryController.getById)
+    .patch(notaryController.patch)
+    .put(notaryController.replace)
+    .delete(notaryController.delete);
+
+router.route('/:id/status')
+    .patch(notaryController.updateStatus);
 
 export default router;

@@ -4,7 +4,7 @@ import serviceRouter from "./notaryservice.routes";
 
 const router = Router();
 
-router.use("/users", userRouter);
-router.use("/service", serviceRouter);
+router.use('/users', userRouter);
+router.use('/services', serviceRouter);
 
 export default router;
