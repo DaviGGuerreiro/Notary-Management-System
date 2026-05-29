@@ -1,0 +1,213 @@
+/* src/global.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* Paleta de Cores do Cartório */
+  --primary: #2563eb;       /* Azul corporativo moderno */
+  --primary-hover: #1d4ed8; 
+  --danger: #ef4444;        /* Vermelho para deletar */
+  --danger-hover: #dc2626;
+  --warning: #f59e0b;       /* Amarelo para editar */
+  --warning-hover: #d97706;
+  
+  --bg-color: #f8fafc;      /* Fundo da tela (cinza super claro) */
+  --surface: #ffffff;       /* Fundo das caixas (branco puro) */
+  --text-main: #334155;     /* Texto principal (nunca use preto puro 100%) */
+  --border: #e2e8f0;        /* Linhas da tabela */
+  /* Sombras com personalidade (atualmente todas iguais e fracas) */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(37, 99, 235, 0.08), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 30px rgba(37, 99, 235, 0.12);
+
+  /* Adiciona uma cor de acento sutil para badges e fundos */
+  --primary-light: #eff6ff;
+
+  /* Raio de borda mais moderno */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-full: 9999px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  margin: 0;
+  padding: 0;
+}
+
+/* --- PADRONIZAÇÃO DE BOTÕES --- */
+.btn {
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 600;            /* De 500 para 600 — mais legível */
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;                    /* Espaço para ícones */
+  letter-spacing: 0.01em;
+}
+
+.btn:active {
+  transform: scale(0.95); /* Dá um "clique" físico no botão */
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);   /* ← esse detalhe faz MUITA diferença */
+}
+
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover {
+  background: var(--danger-hover);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-warning { background: var(--warning); color: white; }
+.btn-warning:hover {
+  background: var(--warning-hover);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+/* --- PADRONIZAÇÃO DE CAIXAS (Cards) --- */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 28px 32px;        /* Mais espaço interno = mais respiro */
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+/* --- NAVEGAÇÃO (Layout) --- */
+.navbar {
+  position: sticky;     /* Fica visível ao rolar a página */
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);   /* Efeito vidro fosco moderno */
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar h2 {
+  margin: 0;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-item {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-item.active {
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 2px;
+}
+
+.nav-item:hover {
+  color: var(--primary);
+}
+
+.nav-item-danger {
+  color: var(--danger);
+}
+
+.nav-item-danger:hover {
+  color: var(--danger-hover);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+
+/* --- TABELAS --- */
+.table-wrapper {
+  background: var(--surface);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden; /* Garante que a tabela respeite as bordas arredondadas da caixa */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th {
+  background: var(--primary-light);  /* Azulado sutil no cabeçalho */
+  padding: 14px 20px;
+  font-size: 12px;
+  text-transform: uppercase;          /* Cabeçalho em caps = hierarquia */
+  letter-spacing: 0.06em;
+  color: var(--primary);              /* Azul no header da tabela */
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 16px 20px;
+  vertical-align: middle;             /* Evita desalinhamento com badges */
+}
+
+tbody tr:hover {
+  background: var(--primary-light);
+  cursor: default;
+}
+
+tbody tr {
+  transition: background-color 0.1s ease;
+}
+
+/* --- FORMULÁRIOS E INPUTS --- */
+.input-field {
+  padding: 10px 14px;
+  border: 1.5px solid #cbd5e1;   /* Um pouco mais espessa */
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  background: #fafbfc;           /* Fundo levemente acinzentado */
+  color: var(--text-main);
+}
+
+.input-field:hover {
+  border-color: #94a3b8;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  background: white;             /* Clareia ao focar — detalhe profissional */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.flex-gap {
+  display: flex;
+  gap: 12px;
+}
