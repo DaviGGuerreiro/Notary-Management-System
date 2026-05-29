@@ -5,11 +5,10 @@ Sistema completo (Fullstack) para gestão de usuários e serviços de um cartór
 ## ✨ Funcionalidades
 
 * Cadastro, edição e remoção de usuários
-* Controle de perfis (Administrador / Atendente)
 * Senhas armazenadas com hash seguro via **bcryptjs**
-* Cadastro e acompanhamento de serviços cartoriais
+* Cadastro, edição e remoção de serviços cartoriais
 * Filtro de serviços por status e tipo
-* Autenticação com redirecionamento de rotas
+
 
 ## 🛠️ Tecnologias e Bibliotecas Utilizadas
 
