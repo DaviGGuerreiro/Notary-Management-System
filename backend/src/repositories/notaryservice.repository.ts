@@ -1,6 +1,7 @@
 // src/repositories/notaryservice.repository.ts
 import { prisma } from '../config/db';
-import { UpdateNotaryserviceDTO, CreateNotaryserviceDTO, UpdateNotaryserviceStatusDTO, NotaryserviceResponse } from '../dtos/notaryservice.dto';
+import { UpdateNotaryservicePatchDTO, CreateNotaryserviceDTO, UpdateNotaryserviceStatusDTO, NotaryserviceResponse } from '../dtos/notaryservice.dto';
+import { TipoServico, StatusServico } from '@prisma/client';
 
 export class NotaryserviceRepository {
     
@@ -9,12 +10,6 @@ export class NotaryserviceRepository {
             data: dados
         });
         return novoServico;
-    }
-
-    async findAll(): Promise<NotaryserviceResponse[]> {
-        return await prisma.notaryService.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
     }
 
     async findById(id: string): Promise<NotaryserviceResponse | null> {
@@ -37,7 +32,7 @@ export class NotaryserviceRepository {
         });
     }
 
-    async updateService(id: string, novo: UpdateNotaryserviceDTO): Promise<NotaryserviceResponse> {
+    async updateService(id: string, novo: UpdateNotaryservicePatchDTO): Promise<NotaryserviceResponse> {
         return await prisma.notaryService.update({
             where: { id },
             data: novo
@@ -47,6 +42,18 @@ export class NotaryserviceRepository {
     async delete(id: string): Promise<NotaryserviceResponse>{
         return await prisma.notaryService.delete({
             where: { id }
+        });
+    }
+
+    async getAllServices(filtros: { tipo?: TipoServico, status?: StatusServico }) {
+        return await prisma.notaryService.findMany({
+            where: {
+                tipo: filtros.tipo || undefined,
+                status: filtros.status || undefined,
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
     }
 }

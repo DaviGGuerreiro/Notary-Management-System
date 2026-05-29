@@ -7,7 +7,8 @@ export interface CreateUserDTO {
     perfil?: "ATENDENTE" | "ADMINISTRADOR"; 
 }
 
-export type UpdateUserDTO = Partial<Omit<CreateUserDTO, 'senhaPlana'>>;
+export type UpdateUserPutDTO = Omit<CreateUserDTO, 'senhaPlana'>;
+export type UpdateUserPatchDTO = Partial<UpdateUserPutDTO>;
 
 export type SaveUserDbDTO = Omit<CreateUserDTO, 'senhaPlana'> & {senhaHash: string};
 
