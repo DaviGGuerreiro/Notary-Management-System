@@ -1,4 +1,5 @@
-// frontend/src/pages/ServicesList.tsx
+import { Alerta } from '../components/Alerta';
+import { useMensagem } from '../hooks/useMensagem';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import type { Service } from '../types';
@@ -25,6 +26,14 @@ const StatusBadge = ({ status }: { status: string }) => {
     );
 };
 
+const tipoLabels: Record<Service['tipo'], string> = {
+  CERTIDAO_NASCIMENTO: 'Certidão de Nascimento',
+  RECONHECIMENTO_FIRMA: 'Reconhecimento de Firma',
+  AUTENTICACAO: 'Autenticação',
+  ESCRITURA: 'Escritura',
+  OUTRO: 'Outro'
+};
+
 export function ServicesList() {
   const [services, setServices] = useState<Service[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
@@ -37,6 +46,7 @@ export function ServicesList() {
   const [novoTipo, setNovoTipo] = useState<Service['tipo']>('CERTIDAO_NASCIMENTO');
   const [novaDescricao, setNovaDescricao] = useState('');
   const [novaObservacao, setNovaObservacao] = useState('');
+  const {mensagem, mostrarMensagem } = useMensagem();
 
     const handleUpdateService = async (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -51,13 +61,13 @@ export function ServicesList() {
                 descricao: editingService.descricao,
                 observacoes: editingService.observacoes
             });
-            
-            alert('Serviço atualizado!');
+            mostrarMensagem('sucesso', 'Usuário criado!');
+
             setEditingService(null);
             loadServices(); // Atualiza a lista
-        } catch (error) {
-            console.error('Erro ao atualizar:', error);
-            alert('Erro ao atualizar serviço.');
+        } catch (error : any) {
+            const texto = error?.response?.data?.erro || 'Erro ao atualizar o serviço.';
+            mostrarMensagem('erro', texto);
         }
     };
 
@@ -73,8 +83,7 @@ export function ServicesList() {
             // O status geralmente não é enviado na criação, o backend deve setar 'AGUARDANDO' por padrão
         });
         
-        alert('Serviço criado com sucesso!');
-        
+        mostrarMensagem('sucesso', 'Serviço criado!');
         // Limpa os campos
         setNovoNome('');
         setNovoCpf('');
@@ -82,11 +91,10 @@ export function ServicesList() {
         setNovaObservacao('');
         setNovoTipo('CERTIDAO_NASCIMENTO');
         
-        // Atualiza a tabela
-        loadServices(); 
-        } catch (error) {
-        console.error('Erro ao criar serviço:', error);
-        alert('Erro ao criar o serviço. Verifique os dados.');
+        loadServices(); //atualiza tabela de listagem.
+        } catch (error: any) {
+            const texto = error?.response?.data?.erro || 'Erro ao criar o serviço.';
+            mostrarMensagem('erro', texto);
         }
     };
 
@@ -95,11 +103,14 @@ export function ServicesList() {
         
         try {
         await api.delete(`/services/${deletingService.id}`);
+        
+        mostrarMensagem('sucesso', 'Serviço deletado com sucesso!');
+
         setDeletingService(null); // Esconde a div de confirmação
         loadServices(); // Recarrega a tabela
-        } catch (error) {
-        console.error('Erro ao deletar:', error);
-        alert('Erro ao excluir o serviço.');
+        } catch (error: any) {
+            const texto = error?.response?.data?.erro || 'Erro ao deletar o serviço.';
+            mostrarMensagem('erro', texto);
         }
     };
 
@@ -131,6 +142,9 @@ export function ServicesList() {
         {/* ↑ Contador dinâmico dá feedback instantâneo ao filtrar */}
         </div>
       {/* Caixa de Confirmação de Deleção (Usando a classe .card que já criamos!) */}
+
+      <Alerta mensagem={mensagem} />
+
       {deletingService && (
         <div className="card" style={{ borderColor: '#f5c6cb', backgroundColor: '#fdf3f4', marginBottom: '24px' }}>
           <h3 style={{ color: '#721c24', marginTop: 0 }}>⚠️ Confirmar Exclusão</h3>
@@ -185,11 +199,11 @@ export function ServicesList() {
                 value={novoTipo}
                 onChange={e => setNovoTipo(e.target.value as Service['tipo'])}
                 >
-                <option value="Certidão de Nascimento">Certidão de Nascimento</option>
-                <option value="Reconhecimento de Firma">Reconhecimento de Firma</option>
-                <option value="Autenticação">Autenticação</option>
-                <option value="Escritura">Escritura</option>
-                <option value="Outro">Outro</option>
+                <option value="CERTIDAO_NASCIMENTO">Certidão de Nascimento</option>
+                <option value="RECONHECIMENTO_FIRMA">Reconhecimento de Firma</option>
+                <option value="AUTENTICACAO">Autenticação</option>
+                <option value="ESCRITURA">Escritura</option>
+                <option value="OUTRO">Outro</option>
                 </select>
             </div>
 
@@ -375,7 +389,7 @@ export function ServicesList() {
             {services.map(s => (
               <tr key={s.id}>
                 <td style={{ fontWeight: 500 }}>{s.solicitanteNome}</td>
-                <td>{s.tipo}</td>
+                <td>{tipoLabels[s.tipo]}</td>
                 <td style={{ fontSize: '13px', color: '#64748b' }}>
                   <StatusBadge status={s.status} />
                 </td>

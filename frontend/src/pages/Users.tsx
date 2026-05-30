@@ -1,4 +1,5 @@
 import { Alerta } from '../components/Alerta';
+import { useMensagem } from '../hooks/useMensagem';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import type { User } from '../types';
@@ -12,16 +13,11 @@ export function Users() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senhaPlana, setSenhaPlana] = useState('');
-  const [mensagem, setMensagem] = useState<{ tipo: 'sucesso' | 'erro'; texto: string } | null>(null);
+  const {mensagem, mostrarMensagem } = useMensagem();
 
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  const mostrarMensagem = (tipo: 'sucesso' | 'erro', texto: string) => {
-    setMensagem({ tipo, texto });
-    setTimeout(() => setMensagem(null), 3000);
-  };
 
   const fetchUsers = async () => {
     try {
