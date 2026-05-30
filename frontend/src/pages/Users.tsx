@@ -1,4 +1,4 @@
-// frontend/src/pages/Users.tsx
+import { Alerta } from '../components/Alerta';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import type { User } from '../types';
@@ -8,73 +8,79 @@ export function Users() {
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [viewingUser, setViewingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [senhaPlana, setSenhaPlana] = useState(''); // usesState para criar conjunto variavel - construtor que mude ela, para mapear os estados do sistema.
+  const [senhaPlana, setSenhaPlana] = useState('');
+  const [mensagem, setMensagem] = useState<{ tipo: 'sucesso' | 'erro'; texto: string } | null>(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const mostrarMensagem = (tipo: 'sucesso' | 'erro', texto: string) => {
+    setMensagem({ tipo, texto });
+    setTimeout(() => setMensagem(null), 3000);
+  };
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await api.get('/users');
       setUsers(response.data);
-    } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-      alert('Erro ao carregar os usuários do servidor.');
+    } catch (error: any) {
+      const texto = error?.response?.data?.erro || 'Erro na busca de usuários';
+      mostrarMensagem('erro', texto);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handles para processar eventos feitos pela interação com o frontend.
   const handleCreateUser = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     try {
       await api.post('/users', { nome, email, senhaPlana });
-      alert('Usuário criado com sucesso!');
-      setNome(''); 
-      setEmail(''); 
+      mostrarMensagem('sucesso', 'Usuário criado com sucesso!');
+      setNome('');
+      setEmail('');
       setSenhaPlana('');
       fetchUsers();
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      alert('Erro ao criar usuário. Verifique os dados.');
+    } catch (error: any) {
+      const texto = error?.response?.data?.erro || 'Erro na tentativa de criar usuário';
+      mostrarMensagem('erro', texto);
     }
   };
 
   const handleUpdateUser = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!editingUser) return;
-
     try {
-      await api.put(`/users/${editingUser.id}`, {
+      await api.patch(`/users/${editingUser.id}`, {
         nome: editingUser.nome,
         email: editingUser.email
       });
-      alert('Usuário atualizado!');
+      mostrarMensagem('sucesso', 'Usuário editado com sucesso!');
       setEditingUser(null);
       fetchUsers();
-    } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
-      alert('Erro ao atualizar o usuário.');
+    } catch (error: any) {
+      const texto = error?.response?.data?.erro || 'Erro na tentativa de editar usuário';
+      mostrarMensagem('erro', texto);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Tem certeza que deseja apagar este usuário?')) return;
+  const handleConfirmDelete = async () => {
+    if (!deletingUser) return;
     try {
-      await api.delete(`/users/${id}`);
+      await api.delete(`/users/${deletingUser.id}`);
+      setDeletingUser(null);
+      mostrarMensagem('sucesso', 'Usuário removido com sucesso!');
       fetchUsers();
-    } catch (error) {
-      console.error('Erro ao deletar usuário:', error);
-      alert('Erro ao excluir o usuário.');
+    } catch (error: any) {
+      const texto = error?.response?.data?.erro || 'Erro na tentativa de deletar usuário';
+      mostrarMensagem('erro', texto);
     }
   };
 
-  // retorno jsx, compilado para js e entregue ao browser.
   return (
     <div>
       <div style={{ marginBottom: '28px' }}>
@@ -85,6 +91,25 @@ export function Users() {
           {users.length} usuário{users.length !== 1 ? 's' : ''} cadastrado{users.length !== 1 ? 's' : ''}
         </p>
       </div>
+
+      {/* Alerta de feedback */}
+      <Alerta mensagem={mensagem} />
+
+      {/* Painel de confirmação de exclusão */}
+      {deletingUser && (
+        <div className="card" style={{ borderColor: '#fecaca', backgroundColor: '#fef2f2', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <p style={{ margin: 0, color: '#991b1b', fontWeight: 500 }}>
+              ⚠️ Tem certeza que deseja remover <strong>{deletingUser.nome}</strong>?
+            </p>
+            <div className="flex-gap">
+              <button onClick={handleConfirmDelete} className="btn btn-danger">Sim, remover</button>
+              <button onClick={() => setDeletingUser(null)} className="btn" style={{ background: '#e2e8f0' }}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Painel para Detalhar User */}
       {viewingUser && (
         <div className="card" style={{ borderColor: '#bae6fd', backgroundColor: '#f0f9ff', marginBottom: '24px' }}>
@@ -97,23 +122,23 @@ export function Users() {
                 <strong>Nome:</strong> <span>{viewingUser.nome}</span>
                 <strong>E-mail:</strong> <span>{viewingUser.email}</span>
                 <strong>Perfil:</strong> <span>{viewingUser.perfil}</span>
-                <strong>Criado em:</strong> 
+                <strong>Criado em:</strong>
                 <span>
-                  {viewingUser.createdAt 
-                    ? new Date(viewingUser.createdAt).toLocaleString('pt-BR') 
+                  {viewingUser.createdAt
+                    ? new Date(viewingUser.createdAt).toLocaleString('pt-BR')
                     : 'Data não disponível'}
                 </span>
-                <strong>Última atualização:</strong> 
+                <strong>Última atualização:</strong>
                 <span>
-                  {viewingUser.updatedAt 
-                    ? new Date(viewingUser.updatedAt).toLocaleString('pt-BR') 
+                  {viewingUser.updatedAt
+                    ? new Date(viewingUser.updatedAt).toLocaleString('pt-BR')
                     : 'Data não disponível'}
                 </span>
               </div>
             </div>
-            <button 
-              onClick={() => setViewingUser(null)} 
-              className="btn" 
+            <button
+              onClick={() => setViewingUser(null)}
+              className="btn"
               style={{ background: '#e2e8f0', color: '#475569' }}
             >
               Fechar
@@ -121,23 +146,24 @@ export function Users() {
           </div>
         </div>
       )}
+
       {/* Painel para Editar User */}
       {editingUser && (
         <div className="card" style={{ borderColor: '#fde68a', backgroundColor: '#fffbeb', marginBottom: '24px' }}>
           <h3 style={{ marginTop: 0, color: '#92400e' }}>Editando: {editingUser.nome}</h3>
           <form onSubmit={handleUpdateUser} className="flex-gap">
-            <input 
+            <input
               className="input-field"
               placeholder="Nome"
-              value={editingUser.nome} 
-              onChange={e => setEditingUser({...editingUser, nome: e.target.value})} 
+              value={editingUser.nome}
+              onChange={e => setEditingUser({ ...editingUser, nome: e.target.value })}
             />
-            <input 
+            <input
               className="input-field"
               placeholder="E-mail"
               type="email"
-              value={editingUser.email} 
-              onChange={e => setEditingUser({...editingUser, email: e.target.value})} 
+              value={editingUser.email}
+              onChange={e => setEditingUser({ ...editingUser, email: e.target.value })}
             />
             <button type="submit" className="btn btn-warning">Salvar Alterações</button>
             <button type="button" onClick={() => setEditingUser(null)} className="btn" style={{ background: '#e2e8f0' }}>Cancelar</button>
@@ -153,17 +179,14 @@ export function Users() {
             <label style={{ fontSize: '14px', fontWeight: 500 }}>Nome</label>
             <input required className="input-field" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: Davi" />
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minWidth: '200px' }}>
             <label style={{ fontSize: '14px', fontWeight: 500 }}>E-mail</label>
             <input required type="email" className="input-field" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="exemplo@cartorio.com" />
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, minWidth: '200px' }}>
             <label style={{ fontSize: '14px', fontWeight: 500 }}>Senha</label>
             <input required type="password" className="input-field" value={senhaPlana} onChange={(e) => setSenhaPlana(e.target.value)} placeholder="••••••••" />
           </div>
-
           <button type="submit" className="btn btn-primary" style={{ height: '40px' }}>
             Cadastrar
           </button>
@@ -186,26 +209,26 @@ export function Users() {
             </thead>
             <tbody>
               {users.length === 0 ? (
-              <tr>
-                <td colSpan={4} style={{ 
-                  textAlign: 'center', padding: '48px', 
-                  color: '#94a3b8', fontSize: '14px' 
-                }}>
-                  <div style={{ fontSize: '32px', marginBottom: '8px' }}>👤</div>
-                  Nenhum usuário cadastrado ainda.
-                </td>
-              </tr>
-            ) :users.map((user) => (
+                <tr>
+                  <td colSpan={4} style={{
+                    textAlign: 'center', padding: '48px',
+                    color: '#94a3b8', fontSize: '14px'
+                  }}>
+                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>👤</div>
+                    Nenhum usuário cadastrado ainda.
+                  </td>
+                </tr>
+              ) : users.map((user) => (
                 <tr key={user.id}>
                   <td>{user.nome}</td>
                   <td>{user.email}</td>
                   <td>
-                    <span style={{ 
-                      fontWeight: 600, 
-                      fontSize: '12px', 
-                      padding: '4px 8px', 
+                    <span style={{
+                      fontWeight: 600,
+                      fontSize: '12px',
+                      padding: '4px 8px',
                       borderRadius: '12px',
-                      backgroundColor: user.perfil === 'ADMINISTRADOR' ? '#fee2e2' : '#e0f2fe', 
+                      backgroundColor: user.perfil === 'ADMINISTRADOR' ? '#fee2e2' : '#e0f2fe',
                       color: user.perfil === 'ADMINISTRADOR' ? '#991b1b' : '#0369a1'
                     }}>
                       {user.perfil}
@@ -213,9 +236,9 @@ export function Users() {
                   </td>
                   <td>
                     <div className="flex-gap">
-                      <button onClick={() => {setViewingUser(user);setEditingUser(null);}} className="btn btn-primary">Detalhes</button>
-                      <button onClick={() => {setEditingUser(user); setViewingUser(null);}} className="btn btn-warning">Editar</button>
-                      <button onClick={() => handleDelete(user.id)} className="btn btn-danger">Remover</button>
+                      <button onClick={() => { setViewingUser(user); setEditingUser(null); setDeletingUser(null); }} className="btn btn-primary">Detalhes</button>
+                      <button onClick={() => { setEditingUser(user); setViewingUser(null); setDeletingUser(null); }} className="btn btn-warning">Editar</button>
+                      <button onClick={() => { setDeletingUser(user); setViewingUser(null); setEditingUser(null); }} className="btn btn-danger">Remover</button>
                     </div>
                   </td>
                 </tr>
