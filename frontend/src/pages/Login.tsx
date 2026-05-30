@@ -13,8 +13,9 @@ export function Login() {
     try {
       await api.post('/users/login', { email, senhaPlana: senha });
       navigate('/usuarios');
-    } catch {
-      setErro('E-mail ou senha inválidos.');
+    } catch (error: any) {
+      const texto = error?.response?.data?.erro || 'E-mail ou senha inválidos.';
+      setErro(texto);
     }
   };
 
