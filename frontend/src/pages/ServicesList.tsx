@@ -120,7 +120,7 @@ export function ServicesList() {
 
     const loadServices = async () => {
         try {
-          const params: any = {};
+          const params: { status?: string; tipo?: string } = {};
           if (statusFilter) params.status = statusFilter;
           if (typeFilter) params.tipo = typeFilter;
           const response = await api.get('/services', {params});
